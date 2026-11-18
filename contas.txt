@@ -1,0 +1,8 @@
+contas ={
+    'id':1,
+    'descricao':'descrição',
+    'valor': 27.00,
+    'tipo': 'despesa',
+    'vencimento': '22/10/27',
+    'status': 'Pendente'
+}
