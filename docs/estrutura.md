@@ -56,17 +56,17 @@ Formato da ordem:
 | 5       | status     | str   |
 
 ## 5. Regras e cuidados
-### 5.2 Decimal com ponto
+### 5.1 Decimal com ponto
 - Regra: o valor deve usar ponto (.) como separador decimal, nunca vírgula. Exemplo: 27.00 e não 27,00.
 - Por quê: float('27,00') gera um ValueError. Se esse erro não for tratado, o programa fecha na hora da leitura do arquivo ou do cadastro.
 - Onde conferir: antes de gravar, no clique em Salvar. A conversão com float() fica dentro de um try/except; se der ValueError, o programa mostra um aviso (messagebox na Aula 3) e não grava a conta.
 
-### 5.3 Maiúsculas em tipo e status
+### 5.2 Maiúsculas em tipo e status
 - Regra: tipo e status devem ser exatamente um dos valores das tuplas: Receita ou Despesa; Pendente ou Pago. Escrever 'despesa' em minúsculo não vale.
 - Por quê: 'despesa' == 'Despesa' é False. Uma conta com a grafia errada fica fora das somas de calcular_resumo e o saldo sai errado, sem nenhum erro visível.
 - Onde conferir: na tela, o usuário escolhe de uma lista alimentada pelas tuplas TIPOS e STATUS_OPCOES (em vez de digitar), e ao carregar o arquivo o valor lido pode ser conferido com "in TIPOS" / "in STATUS_OPCOES".
 
-### 5.4 Data no formato AAAA/MM/DD
+### 5.3 Data no formato AAAA/MM/DD
 - Regra: o vencimento usa o formato AAAA/MM/DD, igual em todo o projeto (tela, memória e arquivo), sem aspas no .txt.
 - Por quê: o Python compara texto da esquerda para a direita. Com o ano na frente, a ordem do texto é a ordem do calendário. Em DD/MM/AAAA, '05/01/2027' < '25/12/2026' dá True, embora janeiro de 2027 venha depois.
 - Onde conferir: ao salvar, verificando o formato digitado antes de gravar.

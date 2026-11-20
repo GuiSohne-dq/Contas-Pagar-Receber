@@ -1,8 +1,4 @@
-contas ={
-    'id':1,
-    'descricao':'descrição',
-    'valor': 27.00,
-    'tipo': 'despesa',
-    'vencimento': '22/10/27',
-    'status': 'Pendente'
-}
+1;Aluguel;250.0;Despesa;2026/12/25;Pendente
+2;Salario;1700.0;Receita;2026/12/05;Pendente
+3;Mercado;140.0;Despesa;2026/11/06;Pago
+4;Frio;500.0;Receita;2026/10/30;Pago
