@@ -64,7 +64,7 @@ def excluir_conta(contas, id_conta):
 
 def alterar_status(contas, id_conta, novo_status):
     for conta in contas:
-        if conta['id'] ==id_conta:
+        if conta['id'] == id_conta:
             conta['status'] = novo_status
             return True
-        return False
+    return False
