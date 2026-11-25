@@ -1,5 +1,0 @@
-1;Aluguel;250.0;Despesa;2026/12/25;Pendente
-2;Salario;1700.0;Receita;2026/12/05;Pendente
-3;Mercado;140.0;Despesa;2026/11/06;Pago
-4;Frio;500.0;Receita;2026/10/30;Pago
-5;Aluguel Praia;400.0;Despesa;2027/01/01;Pago

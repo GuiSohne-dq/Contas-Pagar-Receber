@@ -1,4 +1,4 @@
-# Estrutura de Dados
+x# Estrutura de Dados
 
 ## 1. Tuplas (constantes)
 ```
@@ -59,7 +59,7 @@ Formato da ordem:
 ### 5.1 Decimal com ponto
 - Regra: o valor deve usar ponto (.) como separador decimal, nunca vírgula. Exemplo: 27.00 e não 27,00.
 - Por quê: float('27,00') gera um ValueError. Se esse erro não for tratado, o programa fecha na hora da leitura do arquivo ou do cadastro.
-- Onde conferir: antes de gravar, no clique em Salvar. A conversão com float() fica dentro de um try/except; se der ValueError, o programa mostra um aviso (messagebox na Aula 3) e não grava a conta.
+- Onde conferir: antes de gravar, no clique em Salvar. A conversão com float() fica dentro de um try/except; se der ValueError, o programa mostra um aviso e não grava a conta.
 
 ### 5.2 Maiúsculas em tipo e status
 - Regra: tipo e status devem ser exatamente um dos valores das tuplas: Receita ou Despesa; Pendente ou Pago. Escrever 'despesa' em minúsculo não vale.

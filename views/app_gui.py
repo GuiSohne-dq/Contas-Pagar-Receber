@@ -5,7 +5,7 @@ from datetime import datetime
 from services.finance_manager import (
     TIPOS, STATUS_OPCOES,
     carregar_contas, salvar_contas, calcular_resumo,
-    adicionar_conta, excluir_conta, alterar_status
+    adicionar_conta, excluir_conta, alterar_status, editar_conta
 )
 
 # ---------- cores ----------
@@ -14,7 +14,9 @@ COR_TOPO = '#1f2a44'
 COR_AZUL = '#3b82f6'
 COR_VERDE = '#16a34a'
 COR_VERMELHO = '#dc2626'
+COR_LARANJA = '#d97706'
 COR_PAGO = '#9ca3af'
+COR_CINZA = '#6b7280'
 
 FONTE = ('Segoe UI', 10)
 
@@ -26,6 +28,7 @@ class App:
         self.janela.geometry('1000x600')
         self.janela.minsize(900, 520)
         self.janela.configure(bg=COR_FUNDO)
+        self.id_editando = None
         self.contas = carregar_contas()
 
         self.configurar_estilo()
@@ -55,6 +58,7 @@ class App:
         painel = tk.LabelFrame(self.janela, text=' Nova conta ', bg=COR_FUNDO,
                                font=FONTE, padx=10, pady=8)
         painel.pack(fill='x', padx=15, pady=(12, 6))
+        self.painel_form = painel
 
         tk.Label(painel, text='Descrição:', bg=COR_FUNDO, font=FONTE).grid(
             row=0, column=0, padx=5, pady=4, sticky='e')
@@ -83,10 +87,18 @@ class App:
         self.combo_status.current(0)
         self.combo_status.grid(row=1, column=3, padx=5, pady=4)
 
-        tk.Button(painel, text='Adicionar', font=FONTE, bg=COR_AZUL, fg='white',
-                  activebackground='#2563eb', activeforeground='white',
-                  relief='flat', padx=14, pady=3,
-                  command=self.on_adicionar).grid(row=1, column=5, padx=5, pady=4)
+        self.btn_cancelar = tk.Button(painel, text='Cancelar', font=FONTE, bg=COR_CINZA,
+                                      fg='white', activebackground='#4b5563',
+                                      activeforeground='white', relief='flat',
+                                      padx=14, pady=3, command=self.cancelar_edicao)
+        self.btn_cancelar.grid(row=1, column=4, padx=5, pady=4, sticky='e')
+        self.btn_cancelar.grid_remove()
+
+        self.btn_salvar = tk.Button(painel, text='Adicionar', font=FONTE, bg=COR_AZUL,
+                                    fg='white', activebackground='#2563eb',
+                                    activeforeground='white', relief='flat',
+                                    padx=14, pady=3, command=self.on_adicionar)
+        self.btn_salvar.grid(row=1, column=5, padx=5, pady=4)
 
     def criar_tree(self, painel):
         colunas = ('id', 'descricao', 'valor', 'vencimento', 'status')
@@ -104,6 +116,7 @@ class App:
         barra.pack(side='right', fill='y')
 
         tree.tag_configure('pago', foreground=COR_PAGO)
+        tree.bind('<Double-1>', lambda e: self.on_editar())
         return tree
 
     def montar_paineis(self):
@@ -124,11 +137,10 @@ class App:
         painel_desp.grid(row=0, column=1, sticky='nsew', padx=5)
         self.tree_despesas = self.criar_tree(painel_desp)
 
-        # ao selecionar numa tabela, limpa a seleção da outra
         self.tree_receitas.bind('<<TreeviewSelect>>',
-                                lambda e: self.tree_despesas.selection_remove(self.tree_despesas.selection()))
+                                lambda e: self.limpar_outra(self.tree_receitas, self.tree_despesas))
         self.tree_despesas.bind('<<TreeviewSelect>>',
-                                lambda e: self.tree_receitas.selection_remove(self.tree_receitas.selection()))
+                                lambda e: self.limpar_outra(self.tree_despesas, self.tree_receitas))
 
         painel_total = tk.LabelFrame(area, text=' Total ', bg=COR_FUNDO,
                                      font=FONTE, padx=12, pady=10)
@@ -151,10 +163,14 @@ class App:
                   fg='white', activebackground='#b91c1c', activeforeground='white',
                   relief='flat', padx=14, pady=4,
                   command=self.on_excluir).pack(side='left', padx=10)
-        tk.Button(barra, text='Marcar Como Pago', font=FONTE, bg=COR_VERDE,
+        tk.Button(barra, text='Alternar Pago/Pendente', font=FONTE, bg=COR_VERDE,
                   fg='white', activebackground='#15803d', activeforeground='white',
                   relief='flat', padx=14, pady=4,
-                  command=self.on_marcar_pago).pack(side='left', padx=10)
+                  command=self.on_alternar_status).pack(side='left', padx=10)
+        tk.Button(barra, text='Editar Selecionada', font=FONTE, bg=COR_LARANJA,
+                  fg='white', activebackground='#b45309', activeforeground='white',
+                  relief='flat', padx=14, pady=4,
+                  command=self.on_editar).pack(side='left', padx=10)
 
     # ---------- atualização ----------
     def atualizar_tela(self):
@@ -180,6 +196,33 @@ class App:
                 return int(tree.item(sel[0])['values'][0])
         return None
 
+    def buscar_conta(self, id_conta):
+        for conta in self.contas:
+            if conta['id'] == id_conta:
+                return conta
+        return None
+
+    def gravar(self):
+        if not salvar_contas(self.contas):
+            messagebox.showerror('Erro ao salvar', 'Não foi possível salvar no contas.txt')
+
+    def limpar_formulario(self):
+        self.entry_descricao.delete(0, 'end')
+        self.entry_valor.delete(0, 'end')
+        self.entry_vencimento.delete(0, 'end')
+        self.combo_tipo.current(0)
+        self.combo_status.current(0)
+
+    def cancelar_edicao(self):
+        self.id_editando = None
+        self.limpar_formulario()
+        self.painel_form.config(text='Nova conta')
+        self.btn_salvar.config(text='Adicionar')
+        self.btn_cancelar.grid_remove()
+
+    def limpar_outra(self, tree_atual, outra):
+        if tree_atual.selection() and outra.selection():
+            outra.selection_remove(outra.selection())
     # ---------- ações dos botões ----------
     def on_adicionar(self):
         descricao = self.entry_descricao.get().strip()
@@ -210,13 +253,48 @@ class App:
             messagebox.showerror('Erro', 'Data inválida. Use o formato AAAA/MM/DD (ex.: 2026/12/25).')
             return
 
-        adicionar_conta(self.contas, descricao, valor, tipo, vencimento, status)
-        salvar_contas(self.contas)
-        self.atualizar_tela()
+        if self.id_editando is None:
+            adicionar_conta(self.contas, descricao, valor, tipo, vencimento, status)
+        else:
+            editar_conta(self.contas, self.id_editando, descricao, valor, tipo, vencimento, status)
 
-        self.entry_descricao.delete(0, 'end')
-        self.entry_valor.delete(0, 'end')
-        self.entry_vencimento.delete(0, 'end')
+        self.gravar()
+        self.atualizar_tela()
+        self.cancelar_edicao()
+
+    def on_editar(self):
+        id_conta = self.id_selecionado()
+        if id_conta is None:
+            messagebox.showinfo('Atenção', 'Selecione uma conta na tabela.')
+            return
+        conta = self.buscar_conta(id_conta)
+        if conta is None:
+            return
+
+        self.id_editando = id_conta
+        self.limpar_formulario()
+        self.entry_descricao.insert(0, conta['descricao'])
+        self.entry_valor.insert(0, str(conta['valor']))
+        self.entry_vencimento.insert(0, conta['vencimento'])
+        self.combo_tipo.set(conta['tipo'])
+        self.combo_status.set(conta['status'])
+
+        self.painel_form.config(text=f' Editando a conta {id_conta} ')
+        self.btn_salvar.config(text='Salvar alteração')
+        self.btn_cancelar.grid()
+
+    def on_alternar_status(self):
+        id_conta = self.id_selecionado()
+        if id_conta is None:
+            messagebox.showinfo('Atenção', 'Selecione uma conta na tabela.')
+            return
+        conta = self.buscar_conta(id_conta)
+        if conta is None:
+            return
+        novo = 'Pendente' if conta['status'] == 'Pago' else 'Pago'
+        alterar_status(self.contas, id_conta, novo)
+        self.gravar()
+        self.atualizar_tela()
 
     def on_excluir(self):
         id_conta = self.id_selecionado()
@@ -225,17 +303,12 @@ class App:
             return
         if messagebox.askyesno('Confirmar', f'Excluir a conta {id_conta}?'):
             excluir_conta(self.contas, id_conta)
-            salvar_contas(self.contas)
+            if self.id_editando == id_conta:
+                self.cancelar_edicao()
+            self.gravar()
             self.atualizar_tela()
 
-    def on_marcar_pago(self):
-        id_conta = self.id_selecionado()
-        if id_conta is None:
-            messagebox.showinfo('Atenção', 'Selecione uma conta na tabela.')
-            return
-        alterar_status(self.contas, id_conta, 'Pago')
-        salvar_contas(self.contas)
-        self.atualizar_tela()
+
 
 
 def iniciar():

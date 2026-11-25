@@ -40,7 +40,7 @@ Um exemplo com várias contas está em [docs/exemplo_contas.txt](docs/exemplo_co
 
 - Listar as contas em duas tabelas (Treeview): uma para receitas e outra para despesas.
 - Adicionar uma conta por um formulário.
-- Marcar uma conta como paga.
+- Alternar uma conta entre paga e pendente
 - Excluir uma conta, com confirmação.
 - Mostrar o total de receitas, despesas e o saldo.
 - Salvar as alterações automaticamente no `contas.txt`.
