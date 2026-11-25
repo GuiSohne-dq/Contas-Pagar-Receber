@@ -5,7 +5,7 @@ x# Estrutura de Dados
 TIPOS = ('Receita', 'Despesa') 
 STATUS_OPCOES = ('Pendente', 'Pago') 
 ```
-Usado para definir as regras de validação e são imutáveis (não aceitam .append()). Além disso, diferenciam maiúsculas de minúsculas: escrever 'despesa' com 'd' minúsculo será rejeitado.
+Usado para definir as regras de validação e são imutáveis. Além disso, diferenciam maiúsculas de minúsculas: escrever 'despesa' com 'd' minúsculo será rejeitado.
 
 ## 2. Dicionário (uma conta)
 | Campo      | Tipo  | Exemplo         |

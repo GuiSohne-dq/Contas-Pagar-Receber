@@ -223,6 +223,7 @@ class App:
     def limpar_outra(self, tree_atual, outra):
         if tree_atual.selection() and outra.selection():
             outra.selection_remove(outra.selection())
+
     # ---------- ações dos botões ----------
     def on_adicionar(self):
         descricao = self.entry_descricao.get().strip()
